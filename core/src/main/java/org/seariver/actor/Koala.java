@@ -24,26 +24,30 @@ public class Koala extends BaseActor {
     private float maxVerticalSpeed;
     private float jumpSpeed;
 
-    public Koala(float x, float y, Stage stage) {
+    public Koala(float x, float y, Stage s) {
+        super(x, y, s);
 
-        super(x, y, stage);
+        stand = loadTexture("assets/koala/stand.png");
+
+        String[] walkFileNames =
+                {"assets/koala/walk-1.png", "assets/koala/walk-2.png",
+                        "assets/koala/walk-3.png", "assets/koala/walk-2.png"};
+
+        walk = loadAnimationFromFiles(walkFileNames, 0.2f, true);
 
         maxHorizontalSpeed = 100;
         walkAcceleration = 200;
         walkDeceleration = 200;
         gravity = 700;
         maxVerticalSpeed = 1000;
+
+        setBoundaryPolygon(8);
+
+        jump = loadTexture("assets/koala/jump.png");
         jumpSpeed = 450;
 
-        stand = loadTexture("koala/stand.png");
-        jump = loadTexture("koala/jump.png");
-
-        String[] walkFileNames = {"koala/walk-1.png", "koala/walk-2.png", "koala/walk-3.png", "koala/walk-2.png"};
-        walk = loadAnimationFromFiles(walkFileNames, 0.2f, true);
-
-        this.setBoundaryPolygon(6);
-
-        belowSensor = new BaseActor(0, 0, stage);
+        // set up the below sensor
+        belowSensor = new BaseActor(0, 0, s);
         belowSensor.loadTexture("assets/white.png");
         belowSensor.setSize(this.getWidth() - 8, 8);
         belowSensor.setBoundaryRectangle();
@@ -54,15 +58,14 @@ public class Koala extends BaseActor {
 
         super.act(deltaTime);
 
-        // acceleration
+        // get keyboard input
         if (input.isKeyPressed(Keys.LEFT)) accelerationVec.add(-walkAcceleration, 0);
         if (input.isKeyPressed(Keys.RIGHT)) accelerationVec.add(walkAcceleration, 0);
-        velocityVec.add(accelerationVec.x * deltaTime, accelerationVec.y * deltaTime);
-
 
         // decelerate when not accelerating
         if (!input.isKeyPressed(Keys.RIGHT) && !input.isKeyPressed(Keys.LEFT)) {
             float decelerationAmount = walkDeceleration * deltaTime;
+
             float walkDirection;
 
             if (velocityVec.x > 0) {
@@ -72,6 +75,7 @@ public class Koala extends BaseActor {
             }
 
             float walkSpeed = Math.abs(velocityVec.x);
+
             walkSpeed -= decelerationAmount;
 
             if (walkSpeed < 0) {
@@ -81,8 +85,13 @@ public class Koala extends BaseActor {
             velocityVec.x = walkSpeed * walkDirection;
         }
 
-        velocityVec.x = MathUtils.clamp(velocityVec.x, -maxHorizontalSpeed, maxHorizontalSpeed);
-        velocityVec.y = MathUtils.clamp(velocityVec.y, -maxVerticalSpeed, maxVerticalSpeed);
+        // apply gravity
+        accelerationVec.add(0, -gravity);
+
+        velocityVec.add(accelerationVec.x * deltaTime, accelerationVec.y * deltaTime);
+
+        velocityVec.x = MathUtils.clamp(velocityVec.x,
+                -maxHorizontalSpeed, maxHorizontalSpeed);
 
         moveBy(velocityVec.x * deltaTime, velocityVec.y * deltaTime);
 
@@ -92,12 +101,9 @@ public class Koala extends BaseActor {
         // move the below sensor below the koala
         belowSensor.setPosition(getX() + 4, getY() - 8);
 
-        alignCamera();
-        boundToWorld();
-
+        // manage animations
         if (this.isOnSolid()) {
             belowSensor.setColor(Color.GREEN);
-
             if (velocityVec.x == 0) {
                 setAnimation(stand);
             } else {
@@ -107,6 +113,15 @@ public class Koala extends BaseActor {
             belowSensor.setColor(Color.RED);
             setAnimation(jump);
         }
+
+        if (velocityVec.x > 0) // face right
+            setScaleX(1);
+
+        if (velocityVec.x < 0) // face left
+            setScaleX(-1);
+
+        alignCamera();
+        boundToWorld();
     }
 
     public boolean belowOverlaps(BaseActor actor) {
