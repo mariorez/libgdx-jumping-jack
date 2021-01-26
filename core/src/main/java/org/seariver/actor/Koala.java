@@ -25,13 +25,12 @@ public class Koala extends BaseActor {
     private float jumpSpeed;
 
     public Koala(float x, float y, Stage s) {
+
         super(x, y, s);
 
-        stand = loadTexture("assets/koala/stand.png");
+        stand = loadTexture("koala/stand.png");
 
-        String[] walkFileNames =
-                {"assets/koala/walk-1.png", "assets/koala/walk-2.png",
-                        "assets/koala/walk-3.png", "assets/koala/walk-2.png"};
+        String[] walkFileNames = {"koala/walk-1.png", "koala/walk-2.png", "koala/walk-3.png", "koala/walk-2.png"};
 
         walk = loadAnimationFromFiles(walkFileNames, 0.2f, true);
 
@@ -43,15 +42,15 @@ public class Koala extends BaseActor {
 
         setBoundaryPolygon(8);
 
-        jump = loadTexture("assets/koala/jump.png");
+        jump = loadTexture("koala/jump.png");
         jumpSpeed = 450;
 
         // set up the below sensor
         belowSensor = new BaseActor(0, 0, s);
-        belowSensor.loadTexture("assets/white.png");
+        belowSensor.loadTexture("white.png");
         belowSensor.setSize(this.getWidth() - 8, 8);
         belowSensor.setBoundaryRectangle();
-        belowSensor.setVisible(true);
+        belowSensor.setVisible(false);
     }
 
     public void act(float deltaTime) {
