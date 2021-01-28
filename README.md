@@ -1,6 +1,13 @@
-# LibGDX - Game Framework
+# Jumping Jack
 
-Game Framework created as a starting point for future projects.
+Jumping Jack is an action game where the character, Jack the Koala, jumps around a level collecting as many coins as possible; he must reach the goal flag before time runs out.
+
+**Controls**
+
+- Left and Right: moves the Koala
+- Space bar: Jump
+
+![Jumping Jack](jumping-Jack-readme.png "Jumping Jack")
 
 ## Setup
 

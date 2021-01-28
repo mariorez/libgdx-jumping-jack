@@ -10,6 +10,7 @@ import org.seariver.BaseActor;
 import org.seariver.BaseGame;
 import org.seariver.BaseScreen;
 import org.seariver.TilemapActor;
+import org.seariver.actor.Coin;
 import org.seariver.actor.Flag;
 import org.seariver.actor.Koala;
 import org.seariver.actor.Solid;
@@ -38,6 +39,11 @@ public class LevelScreen extends BaseScreen {
             new Solid((float) props.get("x"), (float) props.get("y"),
                     (float) props.get("width"), (float) props.get("height"),
                     mainStage);
+        }
+
+        for (MapObject obj : tma.getTileList("Coin")) {
+            MapProperties props = obj.getProperties();
+            new Coin((float) props.get("x"), (float) props.get("y"), mainStage);
         }
 
         for (MapObject obj : tma.getTileList("Flag")) {
@@ -72,16 +78,6 @@ public class LevelScreen extends BaseScreen {
 
         if (gameOver) return;
 
-        for (BaseActor flag : BaseActor.getList(mainStage, "org.seariver.actor.Flag")) {
-            if (jack.overlaps(flag)) {
-                messageLabel.setText("You Win!");
-                messageLabel.setColor(Color.LIME);
-                messageLabel.setVisible(true);
-                jack.remove();
-                gameOver = true;
-            }
-        }
-
         for (BaseActor actor : BaseActor.getList(mainStage, "org.seariver.actor.Solid")) {
             Solid solid = (Solid) actor;
 
@@ -96,6 +92,24 @@ public class LevelScreen extends BaseScreen {
                         jack.velocityVec.y = 0;
                     }
                 }
+            }
+        }
+
+        for (BaseActor coin : BaseActor.getList(mainStage, "org.seariver.actor.Coin")) {
+            if (jack.overlaps(coin)) {
+                coins++;
+                coinLabel.setText("Coins: " + coins);
+                coin.remove();
+            }
+        }
+
+        for (BaseActor flag : BaseActor.getList(mainStage, "org.seariver.actor.Flag")) {
+            if (jack.overlaps(flag)) {
+                messageLabel.setText("You Win!");
+                messageLabel.setColor(Color.LIME);
+                messageLabel.setVisible(true);
+                jack.remove();
+                gameOver = true;
             }
         }
     }
