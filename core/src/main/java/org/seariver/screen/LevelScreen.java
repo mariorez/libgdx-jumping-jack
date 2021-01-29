@@ -14,6 +14,7 @@ import org.seariver.actor.Coin;
 import org.seariver.actor.Flag;
 import org.seariver.actor.Koala;
 import org.seariver.actor.Solid;
+import org.seariver.actor.Springboard;
 import org.seariver.actor.Timer;
 
 import static com.badlogic.gdx.Input.Keys;
@@ -42,6 +43,11 @@ public class LevelScreen extends BaseScreen {
                     mainStage);
         }
 
+        for (MapObject obj : tma.getTileList("Springboard")) {
+            MapProperties props = obj.getProperties();
+            new Springboard((float) props.get("x"), (float) props.get("y"), mainStage);
+        }
+
         for (MapObject obj : tma.getTileList("Coin")) {
             MapProperties props = obj.getProperties();
             new Coin((float) props.get("x"), (float) props.get("y"), mainStage);
@@ -60,6 +66,7 @@ public class LevelScreen extends BaseScreen {
         MapObject startPoint = tma.getRectangleList("start").get(0);
         MapProperties startProps = startPoint.getProperties();
         jack = new Koala((float) startProps.get("x"), (float) startProps.get("y"), mainStage);
+        jack.toFront();
 
         gameOver = false;
         coins = 0;
@@ -116,6 +123,12 @@ public class LevelScreen extends BaseScreen {
                         jack.velocityVec.y = 0;
                     }
                 }
+            }
+        }
+
+        for (BaseActor springboard : BaseActor.getList(mainStage, "org.seariver.actor.Springboard")) {
+            if (jack.belowOverlaps(springboard) && jack.isFalling()) {
+                jack.spring();
             }
         }
 
