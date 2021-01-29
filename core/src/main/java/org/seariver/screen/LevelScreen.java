@@ -14,6 +14,7 @@ import org.seariver.actor.Coin;
 import org.seariver.actor.Flag;
 import org.seariver.actor.Koala;
 import org.seariver.actor.Solid;
+import org.seariver.actor.Timer;
 
 import static com.badlogic.gdx.Input.Keys;
 
@@ -44,6 +45,11 @@ public class LevelScreen extends BaseScreen {
         for (MapObject obj : tma.getTileList("Coin")) {
             MapProperties props = obj.getProperties();
             new Coin((float) props.get("x"), (float) props.get("y"), mainStage);
+        }
+
+        for (MapObject obj : tma.getTileList("Timer")) {
+            MapProperties props = obj.getProperties();
+            new Timer((float) props.get("x"), (float) props.get("y"), mainStage);
         }
 
         for (MapObject obj : tma.getTileList("Flag")) {
@@ -77,6 +83,24 @@ public class LevelScreen extends BaseScreen {
     public void update(float deltaTime) {
 
         if (gameOver) return;
+
+        time -= deltaTime;
+        timeLabel.setText("Time: " + (int) time);
+
+        for (BaseActor timer : BaseActor.getList(mainStage, "org.seariver.actor.Timer")) {
+            if (jack.overlaps(timer)) {
+                time += 20;
+                timer.remove();
+            }
+        }
+
+        if (time <= 0) {
+            messageLabel.setText("Time Up - Game Over");
+            messageLabel.setColor(Color.RED);
+            messageLabel.setVisible(true);
+            jack.remove();
+            gameOver = true;
+        }
 
         for (BaseActor actor : BaseActor.getList(mainStage, "org.seariver.actor.Solid")) {
             Solid solid = (Solid) actor;
