@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import org.seariver.BaseActor;
@@ -13,11 +14,15 @@ import org.seariver.BaseScreen;
 import org.seariver.TilemapActor;
 import org.seariver.actor.Coin;
 import org.seariver.actor.Flag;
+import org.seariver.actor.Key;
 import org.seariver.actor.Koala;
+import org.seariver.actor.Lock;
 import org.seariver.actor.Platform;
 import org.seariver.actor.Solid;
 import org.seariver.actor.Springboard;
 import org.seariver.actor.Timer;
+
+import java.util.ArrayList;
 
 import static com.badlogic.gdx.Input.Keys;
 
@@ -29,12 +34,16 @@ public class LevelScreen extends BaseScreen {
     int coins;
     float time;
 
+    ArrayList<Color> keyList;
+
     Label coinLabel;
     Label timeLabel;
     Label messageLabel;
     Table keyTable;
 
     public void initialize() {
+
+        keyList = new ArrayList<>();
 
         TilemapActor tma = new TilemapActor("map.tmx", mainStage);
 
@@ -68,6 +77,28 @@ public class LevelScreen extends BaseScreen {
         for (MapObject obj : tma.getTileList("Flag")) {
             MapProperties props = obj.getProperties();
             new Flag((float) props.get("x"), (float) props.get("y"), mainStage);
+        }
+
+        for (MapObject obj : tma.getTileList("Key")) {
+            MapProperties props = obj.getProperties();
+            Key key = new Key((float) props.get("x"), (float) props.get("y"), mainStage);
+            String color = (String) props.get("color");
+            if (color.equals("red")) {
+                key.setColor(Color.RED);
+            } else {
+                key.setColor(Color.WHITE);
+            }
+        }
+
+        for (MapObject obj : tma.getTileList("Lock")) {
+            MapProperties props = obj.getProperties();
+            Lock lock = new Lock((float) props.get("x"), (float) props.get("y"), mainStage);
+            String color = (String) props.get("color");
+            if (color.equals("red")) {
+                lock.setColor(Color.RED);
+            } else {
+                lock.setColor(Color.WHITE);
+            }
         }
 
         MapObject startPoint = tma.getRectangleList("start").get(0);
@@ -120,13 +151,21 @@ public class LevelScreen extends BaseScreen {
             Solid solid = (Solid) actor;
 
             if (solid instanceof Platform) {
-
                 if (jack.isJumping() && jack.overlaps(solid)) {
                     solid.setEnabled(false);
                 }
 
                 if (jack.isJumping() && !jack.overlaps(solid)) {
                     solid.setEnabled(true);
+                }
+            }
+
+            if (solid instanceof Lock && jack.overlaps(solid)) {
+                Color lockColor = solid.getColor();
+                if (keyList.contains(lockColor)) {
+                    solid.setEnabled(false);
+                    solid.addAction(Actions.fadeOut(0.5f));
+                    solid.addAction(Actions.after(Actions.removeActor()));
                 }
             }
 
@@ -155,6 +194,18 @@ public class LevelScreen extends BaseScreen {
                 coins++;
                 coinLabel.setText("Coins: " + coins);
                 coin.remove();
+            }
+        }
+
+        for (BaseActor key : BaseActor.getList(mainStage, "org.seariver.actor.Key")) {
+            if (jack.overlaps(key)) {
+                Color keyColor = key.getColor();
+                key.remove();
+                BaseActor keyIcon = new BaseActor(0, 0, uiStage);
+                keyIcon.loadTexture("assets/key-icon.png");
+                keyIcon.setColor(keyColor);
+                keyTable.add(keyIcon);
+                keyList.add(keyColor);
             }
         }
 

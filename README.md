@@ -8,7 +8,7 @@ Jumping Jack is an action game where the character, Jack the Koala, jumps around
 
 - Left and Right key: walk
 - Space bar: jump
-- Space bar + Down key: get off the platform
+- Down key + Space bar : get off the platform
 
 ![Jumping Jack](jumping-Jack-readme.png "Jumping Jack")
 
