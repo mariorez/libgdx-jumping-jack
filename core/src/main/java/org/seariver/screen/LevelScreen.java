@@ -1,5 +1,6 @@
 package org.seariver.screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
@@ -170,8 +171,19 @@ public class LevelScreen extends BaseScreen {
 
     public boolean keyDown(int keyCode) {
 
-        if (keyCode == Keys.SPACE && jack.isOnSolid()) {
-            jack.jump();
+        if (gameOver) return false;
+
+        if (keyCode == Keys.SPACE) {
+            if (Gdx.input.isKeyPressed(Keys.DOWN)) {
+                for (BaseActor actor : BaseActor.getList(mainStage, "org.seariver.actor.Platform")) {
+                    Platform platform = (Platform) actor;
+                    if (jack.belowOverlaps(platform)) {
+                        platform.setEnabled(false);
+                    }
+                }
+            } else if (jack.isOnSolid()) {
+                jack.jump();
+            }
         }
 
         return false;
