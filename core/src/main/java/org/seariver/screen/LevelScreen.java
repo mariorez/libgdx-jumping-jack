@@ -13,6 +13,7 @@ import org.seariver.TilemapActor;
 import org.seariver.actor.Coin;
 import org.seariver.actor.Flag;
 import org.seariver.actor.Koala;
+import org.seariver.actor.Platform;
 import org.seariver.actor.Solid;
 import org.seariver.actor.Springboard;
 import org.seariver.actor.Timer;
@@ -46,6 +47,11 @@ public class LevelScreen extends BaseScreen {
         for (MapObject obj : tma.getTileList("Springboard")) {
             MapProperties props = obj.getProperties();
             new Springboard((float) props.get("x"), (float) props.get("y"), mainStage);
+        }
+
+        for (MapObject obj : tma.getTileList("Platform")) {
+            MapProperties props = obj.getProperties();
+            new Platform((float) props.get("x"), (float) props.get("y"), mainStage);
         }
 
         for (MapObject obj : tma.getTileList("Coin")) {
@@ -111,6 +117,17 @@ public class LevelScreen extends BaseScreen {
 
         for (BaseActor actor : BaseActor.getList(mainStage, "org.seariver.actor.Solid")) {
             Solid solid = (Solid) actor;
+
+            if (solid instanceof Platform) {
+
+                if (jack.isJumping() && jack.overlaps(solid)) {
+                    solid.setEnabled(false);
+                }
+
+                if (jack.isJumping() && !jack.overlaps(solid)) {
+                    solid.setEnabled(true);
+                }
+            }
 
             if (jack.overlaps(solid) && solid.isEnabled()) {
                 Vector2 offset = jack.preventOverlap(solid);
