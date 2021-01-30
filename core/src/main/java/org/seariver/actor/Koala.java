@@ -31,7 +31,6 @@ public class Koala extends BaseActor {
         stand = loadTexture("koala/stand.png");
 
         String[] walkFileNames = {"koala/walk-1.png", "koala/walk-2.png", "koala/walk-3.png", "koala/walk-2.png"};
-
         walk = loadAnimationFromFiles(walkFileNames, 0.2f, true);
 
         maxHorizontalSpeed = 100;
